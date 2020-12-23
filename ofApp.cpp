@@ -1,5 +1,6 @@
 #include "ofApp.h"
 #include <ode/ode.h>
+#include <glm/glm.hpp>
 #define LENGTH 0.7      // chassis length
 #define WIDTH 0.5       // chassis width
 #define HEIGHT 0.2      // chassis height
@@ -23,7 +24,7 @@ void ofApp::setup(){
     cam.setUpAxis(upVector);
 
     //TODO Debug Remove
-    glm::vec3 size(5,5,5);
+    ofVec3f size(5,5,5);
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
     std::cout << size.x << ", "<< size.y << ", "<< size.z << std::endl;
@@ -35,10 +36,25 @@ void ofApp::setup(){
     space = dHashSpaceCreate(0);
     contactGroup = dJointGroupCreate(0);
     dWorldSetGravity(world, 0,0, -0.5);
+    groundtmp = dCreatePlane(space, 0, 0, 1, 0);//THIS IS WHAT COLLIDES
+    dSpaceCollide(space, 0, &nearCallback);
 
+    //DEBUG TO REMOVE ODE SPACES
+    physicsSpace = dSimpleSpaceCreate(space);
+    dSpaceSetCleanup(physicsSpace, 0);
 
     cube = new Cube(5,5,5);
-    cube->SetWorldID(world);
+    cube->SetWorldID(world, physicsSpace);
+    ofVec3f cubPos(0.f, 0.f, 15.f);
+    cube->SetPositon(cubPos);
+
+    ground = new Cube(10, 10, 0.25);
+    ground->SetWorldID(world, physicsSpace);
+    //ground->SetKinematic(true);
+    ground->SetPositon(ofVec3f(0.0f, 0.f, 50.f));
+    ground->SetColour(ofColor::green);
+
+    dAllocateODEDataForThread(dAllocateMaskAll);
 }
 
 //--------------------------------------------------------------
@@ -49,13 +65,15 @@ void ofApp::update(){
     //  |
     //  |
     //  v
-    // dSpaceCollide (space,0, &nearCallback);
-    dWorldStep (world,0.05);
 
-    cube->Update(3);
+    cube->Update(3);//TODO: replace 3 with delta time
+    ground->Update(3);
 
-    // /////////////////////////////////
 
+    dSpaceCollide (space, 0, &nearCallback);
+    dWorldStep (world,0.05); //Simulates physics
+
+    dJointGroupEmpty(contactGroup);//Remove all contact joints
 }
 //--------------------------------------------------------------
 void ofApp::draw(){
@@ -69,10 +87,11 @@ void ofApp::draw(){
     ofPushMatrix();
 
     ofSetColor(ofColor::lightGrey);
-    ofDrawGrid(0.5f, 100, false, false,false,true);
+    //ofDrawGrid(0.5f, 100, false, false,false,true);
     ofDrawAxis(10);
 
     cube->Draw();
+    ground->Draw();
 
     ofDisableDepthTest();
     cam.end();
@@ -94,6 +113,39 @@ void ofApp::exit() {
 }
 //--------------------------------------------------------------
 
+
+static void nearCallback(void *, dGeomID o1, dGeomID o2){
+    myApp->collide(o1, o2);
+}
+
+void ofApp::collide(dGeomID o1, dGeomID o2)
+{
+  int i,n;
+
+  // only collide things with the ground
+  int g1 = (o1 == ground->GetGeom() || o1 == groundtmp);
+  int g2 = (o2 == ground->GetGeom()|| o2 == groundtmp);
+  if (!(g1 ^ g2)) return;
+
+  const int N = 10;
+  dContact contact[N];
+  n = dCollide (o1,o2,N,&contact[0].geom,sizeof(dContact));
+  if (n > 0) {
+    for (i=0; i<n; i++) {
+      contact[i].surface.mode = dContactSlip1 | dContactSlip2 |
+        dContactSoftERP | dContactSoftCFM | dContactApprox1;
+      contact[i].surface.mu = dInfinity;
+      contact[i].surface.slip1 = 0.1;
+      contact[i].surface.slip2 = 0.1;
+      contact[i].surface.soft_erp = 0.5;
+      contact[i].surface.soft_cfm = 0.3;
+      dJointID c = dJointCreateContact (world, contactGroup, &contact[i]);
+      dJointAttach (c,
+                    dGeomGetBody(contact[i].geom.g1),
+                    dGeomGetBody(contact[i].geom.g2));
+    }
+  }
+}
 
 
 

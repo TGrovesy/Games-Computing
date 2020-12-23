@@ -15,12 +15,12 @@ public:
     virtual void Draw() = 0;
 
     //Transform Stuff
-    void SetPositon(glm::vec3 pos);
-    void SetScaling(glm::vec3 scale);
-    void SetRotation(glm::vec3 rotation, float angleDegrees);
-    glm::vec3 GetPosition() const { return position; }
-    glm::vec3 GetScale() const { return scale; }
-    glm::vec3 GetRotationAxis() const{return rotationAxis;}
+    void SetPositon(ofVec3f pos);
+    void SetScaling(ofVec3f scale);
+    void SetRotation(ofVec3f rotation, float angleDegrees);
+    ofVec3f GetPosition() const { return position; }
+    ofVec3f GetScale() const { return scale; }
+    ofVec3f GetRotationAxis() const{return rotationAxis;}
     float GetRotationAngle() const{return rotationAmount;}
 
     //Identifiers
@@ -28,13 +28,16 @@ public:
     char* GetName() const{ return name; }
 
     //ODE
-    void SetWorldID(dWorldID id);
+    void SetWorldID(dWorldID id, dSpaceID collisionSpace);
+    dGeomID GetGeom() {return geom;}
+    void SetKinematic(bool value);
+
 
 protected:
     //Transforms
-    glm::vec3 position;
-    glm::vec3 scale;
-    glm::vec3 rotationAxis;
+    ofVec3f position;
+    ofVec3f scale;
+    ofVec3f rotationAxis;
     float rotationAmount;
 
     //ODE
@@ -42,6 +45,8 @@ protected:
     dBodyID body;
     dMass mass;
     dGeomID geom;
+
+    bool isKinematic = false;
 
     //Identifiers
     char* name;

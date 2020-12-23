@@ -27,8 +27,11 @@ void Cube::Draw(){
 
     ofPushMatrix();
     ofTranslate(position);
-
     ofRotateDeg(rotationAmount, rotationAxis.x, rotationAxis.y, rotationAxis.z);
     ofDrawBox(0,0,0, GetScale().x, GetScale().y, GetScale().z);
     ofPopMatrix();
+}
+
+void Cube::SetColour(ofColor colour){
+    this->colour = colour;
 }

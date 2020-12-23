@@ -1,5 +1,4 @@
 #pragma once
-
 #include "ofMain.h"
 #include "ode/ode.h"
 
@@ -50,11 +49,15 @@ public:
 
     //TODO: remove! Debug stuff
     Cube* cube;
+    Cube* ground;
+
+    //ODE experimentation
     dWorldID world;
     dSpaceID space;
     dJointGroupID contactGroup;
-    dWorldID GetWorldID(){return world;};
-
+    dWorldID GetWorldID(){return world;}
+    dSpaceID physicsSpace;//TEST TO REMOVE
+    dGeomID groundtmp;
 
     void drawODEDemoBox(const dReal*pos_ode, const dQuaternion rot_ode, const dReal*sides_ode);
     void drawODEDemoCylinder(const dReal*pos_ode, const dQuaternion rot_ode, dReal len, dReal rad);

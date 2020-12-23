@@ -12,6 +12,8 @@ public:
     virtual void Update(float deltaTime);
     virtual void Draw();
 
+    void SetColour(ofColor colour);
+
 private:
     ofColor colour = ofColor::mediumPurple;
 };
