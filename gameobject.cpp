@@ -24,6 +24,7 @@ void GameObject::Draw(){
 void GameObject::SetPositon(ofVec3f pos){
     std::cout << "pos set: " << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
     this->position = pos;
+
     dBodySetPosition(body, position.x, position.y, position.z);//set body position ODE
 }
 

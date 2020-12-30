@@ -3,6 +3,7 @@
 #include "ode/ode.h"
 
 #include "cube.h"
+#include "world.h"
 
 
 class ofApp : public ofBaseApp{
@@ -50,12 +51,14 @@ public:
     //TODO: remove! Debug stuff
     Cube* cube;
     Cube* ground;
+    static World* world;
+    static World* GetWorld() {return world;}
 
     //ODE experimentation
-    dWorldID world;
+    dWorldID worldID;
     dSpaceID space;
     dJointGroupID contactGroup;
-    dWorldID GetWorldID(){return world;}
+    dWorldID GetWorldID(){return worldID;}
     dSpaceID physicsSpace;//TEST TO REMOVE
     dGeomID groundtmp;
 
@@ -67,5 +70,5 @@ public:
  * function, combined with the ofApp pointer, allows us to put the collision
  * code within myApp. Look at the .cpp for details of how this works.
  */
-static void nearCallback (void *, dGeomID o1, dGeomID o2);
+//static void nearCallback (void *, dGeomID o1, dGeomID o2);
 extern ofApp *myApp;

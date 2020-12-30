@@ -2,9 +2,10 @@
 
 Cube::Cube(float x, float y, float z) : GameObject()
 {
+    /*
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
-    std::cout << x << ", "<< y << ", "<< z << std::endl;
+    std::cout << x << ", "<< y << ", "<< z << std::endl;*/
     SetScaling(glm::vec3(x,y,z));
 }
 

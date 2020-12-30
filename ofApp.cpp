@@ -10,7 +10,7 @@
 #define WMASS 0.2       // wheel mass
 
 static const dVector3 yunit = { 0, 1, 0 }, zunit = { 0, 0, 1 };
-
+World* ofApp::world;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -23,19 +23,15 @@ void ofApp::setup(){
     cam.lookAt({0,0,0},upVector);
     cam.setUpAxis(upVector);
 
-    //TODO Debug Remove
-    ofVec3f size(5,5,5);
-    std::cout << std::fixed;
-    std::cout << std::setprecision(2);
-    std::cout << size.x << ", "<< size.y << ", "<< size.z << std::endl;
 
+/*
     //ODE setup Create world
     dInitODE2(0);
 
-    world = dWorldCreate();
+    worldID = dWorldCreate();
     space = dHashSpaceCreate(0);
     contactGroup = dJointGroupCreate(0);
-    dWorldSetGravity(world, 0,0, -0.5);
+    dWorldSetGravity(worldID, 0,0, -0.5);
     groundtmp = dCreatePlane(space, 0, 0, 1, 0);//THIS IS WHAT COLLIDES
     dSpaceCollide(space, 0, &nearCallback);
 
@@ -44,17 +40,19 @@ void ofApp::setup(){
     dSpaceSetCleanup(physicsSpace, 0);
 
     cube = new Cube(5,5,5);
-    cube->SetWorldID(world, physicsSpace);
+    cube->SetWorldID(worldID, physicsSpace);
     ofVec3f cubPos(0.f, 0.f, 15.f);
     cube->SetPositon(cubPos);
 
     ground = new Cube(10, 10, 0.25);
-    ground->SetWorldID(world, physicsSpace);
+    ground->SetWorldID(worldID, physicsSpace);
     //ground->SetKinematic(true);
     ground->SetPositon(ofVec3f(0.0f, 0.f, 50.f));
     ground->SetColour(ofColor::green);
+*/
 
-    dAllocateODEDataForThread(dAllocateMaskAll);
+    ofApp::world = new World();
+    //dAllocateODEDataForThread(dAllocateMaskAll);
 }
 
 //--------------------------------------------------------------
@@ -66,14 +64,16 @@ void ofApp::update(){
     //  |
     //  v
 
+    /*
     cube->Update(3);//TODO: replace 3 with delta time
     ground->Update(3);
 
 
     dSpaceCollide (space, 0, &nearCallback);
-    dWorldStep (world,0.05); //Simulates physics
+    dWorldStep (world->GetWorldID(),0.05); //Simulates physics
 
-    dJointGroupEmpty(contactGroup);//Remove all contact joints
+    dJointGroupEmpty(contactGroup);//Remove all contact joints*/
+    ofApp::world->Update(3);
 }
 //--------------------------------------------------------------
 void ofApp::draw(){
@@ -90,8 +90,9 @@ void ofApp::draw(){
     //ofDrawGrid(0.5f, 100, false, false,false,true);
     ofDrawAxis(10);
 
-    cube->Draw();
-    ground->Draw();
+    /*cube->Draw();
+    ground->Draw();*/
+    ofApp::world->Draw();
 
     ofDisableDepthTest();
     cam.end();
@@ -113,10 +114,10 @@ void ofApp::exit() {
 }
 //--------------------------------------------------------------
 
-
+/*
 static void nearCallback(void *, dGeomID o1, dGeomID o2){
     myApp->collide(o1, o2);
-}
+}*/
 
 void ofApp::collide(dGeomID o1, dGeomID o2)
 {
@@ -139,7 +140,7 @@ void ofApp::collide(dGeomID o1, dGeomID o2)
       contact[i].surface.slip2 = 0.1;
       contact[i].surface.soft_erp = 0.5;
       contact[i].surface.soft_cfm = 0.3;
-      dJointID c = dJointCreateContact (world, contactGroup, &contact[i]);
+      dJointID c = dJointCreateContact (worldID, contactGroup, &contact[i]);
       dJointAttach (c,
                     dGeomGetBody(contact[i].geom.g1),
                     dGeomGetBody(contact[i].geom.g2));
