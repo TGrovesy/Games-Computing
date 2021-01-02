@@ -11,13 +11,13 @@ void World::SetupWorld(){
     SetupPhysics();
 
     //TODO: DEBUG TO TEST REMOVE!
-    for(int i = 0; i < 2; i++){
+    for(int i = 0; i < 20; i++){
         Cube* cube = new Cube(this->worldID, this->spaceID,contactGroup, 5,5,5);
-        cube->SetPositon(ofVec3f((i * 2), 0, ((float)i * 20) + 20));
+        cube->SetPositon(ofVec3f(0, 0, ((float)i * 20) + 20));
         gameObjects.push_back(cube);
     }
 
-    ground = new Cube(this->worldID, this->spaceID, contactGroup,  10, 10, 1);
+    ground = new Cube(this->worldID, this->spaceID, contactGroup,  50, 50, 1);
     ground->SetPositon(ofVec3f(0.f, 0.f, 0));
     ground->SetColour(ofColor::green);
     ground->Freeze();

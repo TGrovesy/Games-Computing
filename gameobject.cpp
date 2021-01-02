@@ -43,7 +43,7 @@ void GameObject::SetScaling(ofVec3f scale){
 void GameObject::SetRotation(ofQuaternion rotation, float angleDegrees){
     this->rotationAmount = angleDegrees;
     this->rotation = rotation;
-    const dReal* newRot = new dReal[]{rotation.w(), rotation.x(),rotation.y(), rotation.z()};
+    const dReal newRot[4] = {rotation.w(), rotation.x(),rotation.y(), rotation.z()};
     dBodySetQuaternion(body, newRot);
 }
 
