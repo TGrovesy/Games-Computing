@@ -5,6 +5,7 @@
 
 #include "ode/ode.h"
 #include "gameobject.h"
+#include "cube.h"
 
 class World
 {
@@ -32,7 +33,9 @@ private:
     //static void nearCallback(void *, dGeomID o1, dGeomID o2);
 
     //DEBUG
+    dSpaceID groundSpace;
     dGeomID groundTMP;
+    Cube* ground;
 
     void SetupWorld();
     void SetupPhysics();
@@ -45,5 +48,5 @@ private:
 * code within myApp. Look at the .cpp for details of how this works.
 */
 
-static void nearCallback (void *, dGeomID o1, dGeomID o2);
+static void nearCallback (void *data, dGeomID o1, dGeomID o2);
 extern World *worldInstance;

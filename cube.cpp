@@ -1,12 +1,8 @@
 #include "cube.h"
 
-Cube::Cube(float x, float y, float z) : GameObject()
+Cube::Cube(dWorldID w, dSpaceID s, dJointGroupID j, float x, float y, float z) : GameObject(w,s, j)
 {
-    /*
-    std::cout << std::fixed;
-    std::cout << std::setprecision(2);
-    std::cout << x << ", "<< y << ", "<< z << std::endl;*/
-    SetScaling(glm::vec3(x,y,z));
+    SetScaling(ofVec3f(x,y,z));
 }
 
 Cube::~Cube(){
@@ -28,7 +24,7 @@ void Cube::Draw(){
 
     ofPushMatrix();
     ofTranslate(position);
-    ofRotateDeg(rotationAmount, rotationAxis.x, rotationAxis.y, rotationAxis.z);
+    ofRotateDeg(rotationAmount, rotationAngle.x, rotationAngle.y, rotationAngle.z);
     ofDrawBox(0,0,0, GetScale().x, GetScale().y, GetScale().z);
     ofPopMatrix();
 }
