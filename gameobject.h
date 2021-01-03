@@ -3,33 +3,38 @@
 #include <glm/glm.hpp>
 #include<ode/ode.h>
 #include<ofMain.h>
+#include <string>
 
 
 class GameObject
 {
 public:
-    GameObject(dWorldID w, dSpaceID s, dJointGroupID j);
+    GameObject(dWorldID w, dSpaceID s);
     virtual ~GameObject();
 
     virtual void Update(float deltaTime) = 0;
     virtual void Draw() = 0;
 
     //Transform Stuff
-    void SetPositon(ofVec3f pos);
+    void SetPosition(ofVec3f pos);
+    ofVec3f GetPosition(){return position;}
     void SetScaling(ofVec3f scale);
-    void SetRotation(ofQuaternion rotation, float angleDegrees);
-    ofVec3f GetPosition() const { return position; }
-    ofVec3f GetScale() const { return scale; }
-    ofQuaternion GetRotationAxis() const{return rotation;}
-    float GetRotationAngle() const{return rotationAmount;}
+    void SetRotation(ofQuaternion rotation);
+    void Rotate(ofVec3f rotationAxis, float amount);
+    ofVec3f GetScale()  { return scale; }
+    ofQuaternion GetRotation() {return rotation;}
+    ofVec3f GetRotationAngle()  {return rotationAngle;}
+    float GetRotationAmount() {return rotationAmount;}
+    void SetRotationAmount(float value){rotationAmount = value;}
 
     //Identifiers
     void SetName(char* name);
-    char* GetName() const{ return name; }
+    std::string GetName() { return name; }
 
     //ODE
     void SetupPhysics(dWorldID id, dSpaceID collisionSpace);
     dxGeom* GetGeom() {return geom;}
+    dBodyID GetBody(){return body;}
     void SetKinematic(bool value);
     void Freeze();
 
@@ -51,13 +56,11 @@ protected:
     dMass mass;
     dGeomID geom;
 
-    //test
-    dJointGroupID jointGroupID;
 
     bool isKinematic = false;
 
     //Identifiers
-    char* name;
+    std::string name;
 
 
 };

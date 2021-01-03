@@ -6,7 +6,7 @@
 class Cube : public GameObject
 {
 public:
-    Cube(dWorldID w, dSpaceID s, dJointGroupID j, float x, float y, float z);
+    Cube(dWorldID w, dSpaceID s, float x, float y, float z);
     virtual ~Cube();
 
     virtual void Update(float deltaTime);

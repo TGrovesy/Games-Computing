@@ -1,6 +1,6 @@
 #include "cube.h"
 
-Cube::Cube(dWorldID w, dSpaceID s, dJointGroupID j, float x, float y, float z) : GameObject(w,s, j)
+Cube::Cube(dWorldID w, dSpaceID s, float x, float y, float z) : GameObject(w,s)
 {
     SetScaling(ofVec3f(x,y,z));
 }

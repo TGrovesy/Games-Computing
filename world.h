@@ -2,10 +2,12 @@
 #define WORLD_H
 
 #include <vector>
+#include <map>
 
 #include "ode/ode.h"
 #include "gameobject.h"
 #include "cube.h"
+#include "player.h"
 
 class World
 {
@@ -22,8 +24,16 @@ public:
     void Update(float deltaTime);
     void collide(dGeomID o1, dGeomID o2);
 
+    std::vector<GameObject*> GetGameObjects(){return gameObjects;}
+    Player* GetPlayer(){return player;}
+
 private:
+    //Objects
     std::vector<GameObject*> gameObjects;
+    std::map<dxGeom*, GameObject*> geoms;
+
+    //Player
+    Player* player;
 
     //Physics
     dWorldID worldID;
