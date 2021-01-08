@@ -8,6 +8,7 @@
 #include "gameobject.h"
 #include "cube.h"
 #include "player.h"
+#include "wall.h"
 
 class World
 {
@@ -39,16 +40,23 @@ private:
     dWorldID worldID;
     dSpaceID spaceID;
     dJointGroupID contactGroup;
-    float gravityValue = -.5f;
+    float gravityValue = -0.5f;
     //static void nearCallback(void *, dGeomID o1, dGeomID o2);
 
     //DEBUG
-    dSpaceID groundSpace;
-    dGeomID groundTMP;
-    Cube* ground;
+    void TestScene();
 
     void SetupWorld();
     void SetupPhysics();
+
+    //Gamemode (Endless Runner)
+    void GamemodeCheck(GameObject* obj);
+    void GamemodeGeneration();
+
+    Wall* gameWall;
+    std::map<GameObject*, bool> undelteableObj;
+
+    int numOfTrucks = 0;
 };
 
 #endif // WORLD_H

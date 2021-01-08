@@ -9,6 +9,7 @@
 class GameObject
 {
 public:
+    GameObject();
     GameObject(dWorldID w, dSpaceID s);
     virtual ~GameObject();
 
@@ -28,15 +29,17 @@ public:
     void SetRotationAmount(float value){rotationAmount = value;}
 
     //Identifiers
-    void SetName(char* name);
+    void SetName(std::string value){name = value;}
     std::string GetName() { return name; }
 
     //ODE
     void SetupPhysics(dWorldID id, dSpaceID collisionSpace);
     dxGeom* GetGeom() {return geom;}
     dBodyID GetBody(){return body;}
-    void SetKinematic(bool value);
-    void Freeze();
+
+    virtual void SetKinematic(bool value);
+
+    virtual void DisableGravity();
 
     void SetMass(dReal newMass);
 

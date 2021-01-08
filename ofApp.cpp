@@ -11,6 +11,7 @@
 
 static const dVector3 yunit = { 0, 1, 0 }, zunit = { 0, 0, 1 };
 World* ofApp::world;
+bool ofApp::keyDown[255];
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -57,9 +58,7 @@ void ofApp::update(){
         dBodyAddForce(player->GetBody(), side.x, side.y, 0);
     }
 
-    if(keyDown[32]){//TODO Add on ground check
-        dBodyAddForce(player->GetBody(), 0, 0, 1.2);
-    }
+
 
     if(keyDown['q']){
         ofExit();
@@ -85,7 +84,7 @@ float x = 0;
 void ofApp::keyPressed(int key){
     keyDown[key] = true;
 
-    std::cout << key << std::endl;
+    //std::cout << key << std::endl;
 //    cout<<speed<<endl;
 }
 

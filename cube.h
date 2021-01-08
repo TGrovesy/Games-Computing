@@ -7,14 +7,14 @@ class Cube : public GameObject
 {
 public:
     Cube(dWorldID w, dSpaceID s, float x, float y, float z);
-    virtual ~Cube();
+    ~Cube();
 
     virtual void Update(float deltaTime);
     virtual void Draw();
 
-    void SetColour(ofColor colour);
+    virtual void SetColour(ofColor colour);
 
-private:
+protected:
     ofColor colour = ofColor::mediumPurple;
 };
 

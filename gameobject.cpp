@@ -1,11 +1,16 @@
 #include "gameobject.h"
 
+GameObject::GameObject(){
+
+}
+
 GameObject::GameObject(dWorldID w, dSpaceID s) : name("UNNAMED"), position(0.0f, 0.0f, 0.0f), scale(1.0f, 1.0f, 1.0f), rotation(0.f, 0.0f, 1.0f, 0.0f), rotationAmount(0.0f){
     SetupPhysics(w, s);
 }
 
 GameObject::~GameObject(){
-
+    dBodyDestroy(body);
+    dGeomDestroy(geom);
 }
 
 /*
@@ -51,9 +56,8 @@ void GameObject::SetScaling(ofVec3f scale){
 Set Rotation Of Object
 */
 void GameObject::SetRotation(ofQuaternion rotation){
+    this->rotation = rotation;
     rotation.getRotate(rotationAmount, rotationAngle);
-    std::cout << rotationAngle.y << ", ";
-    std::cout << rotationAngle.z << std::endl;
     const dReal newRot[4] = {rotation.w(), rotation.x(),rotation.y(), rotation.z()};
     dBodySetQuaternion(body, newRot);
 }
@@ -62,14 +66,9 @@ void GameObject::SetRotation(ofQuaternion rotation){
  * Rotate Object by amount on axis
  */
 void GameObject::Rotate(ofVec3f rotationAxis, float amount){
-    /*ofQuaternion newRot = rotation;
-    newRot.makeRotate(rotationAmount + amount, rotationAxis);
-    rotation = newRot;
-    if(rotationAmount>=360){
-        std::cout << "rest\n";
-        rotationAmount = (int) rotationAmount % 360;
-    }
-    rotation.getRotate(rotationAmount, rotationAngle);*/
+
+
+
     rotation *= glm::angleAxis(glm::radians(amount), glm::vec3(rotationAxis));
 
     const dReal odeRot[4] = {rotation.w(), rotation.x(),rotation.y(), rotation.z()};
@@ -104,9 +103,8 @@ void GameObject::SetKinematic(bool value){
 /*
 Disables Gravity
 */
-void GameObject::Freeze(){
+void GameObject::DisableGravity(){
     dBodySetGravityMode(body, 0);
-    //dJointCreateFixed (world, jointGroupID);
 }
 
 /*

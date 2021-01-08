@@ -42,7 +42,7 @@ public:
     dGeomID groundtmp;
 
     //Keys TODO MOVE ELSEWHERE DONT BELONG HERE!
-    bool keyDown[255];
+    static bool keyDown[255];
 };
 
 /* ODE requires a global function to use as the collision callback; this

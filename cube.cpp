@@ -6,7 +6,6 @@ Cube::Cube(dWorldID w, dSpaceID s, float x, float y, float z) : GameObject(w,s)
 }
 
 Cube::~Cube(){
-
 }
 
 void Cube::Update(float deltaTime){
