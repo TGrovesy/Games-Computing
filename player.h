@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include "gameobject.h"
+#include <string>
 
 class Player : public GameObject
 {
@@ -27,6 +28,7 @@ public:
     float angularSpeed;
     ofVec3f lookAt;
     ofCamera camera;
+
 
 private:
     void SetupCamera();

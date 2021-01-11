@@ -15,18 +15,7 @@ bool ofApp::keyDown[255];
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    /*
-    // Set up the OpenFrameworks camera
-    ofVec3f upVector;
-    upVector.set(0, 0, 1);
-    cam.setAutoDistance(false);
-    cam.setPosition(10,10,10);
-    cam.lookAt({0,0,0},upVector);
-    cam.setUpAxis(upVector);*/
-
-
     ofApp::world = new World();
-    //dAllocateODEDataForThread(dAllocateMaskAll);
 }
 
 //--------------------------------------------------------------
@@ -102,8 +91,6 @@ void ofApp::mouseMoved(int x, int y ){
     //TODO MOVE TO PLAYER FILE
     int dX = x - prevMouseX;
     int dY = y - prevMouseY;
-    //world->GetPlayer()->horizontalAngle+= dX * 0.25f;
-    //world->GetPlayer()->verticalAngle+= dY* 0.25f;
     world->GetPlayer()->Rotate(ofVec3f(0,0,1), -dX * 0.25f);
     world->GetPlayer()->Rotate(world->GetPlayer()->camera.getSideDir(), -dY * 0.25f);//vertical
 

@@ -33,6 +33,8 @@ private:
     std::vector<GameObject*> gameObjects;
     std::map<dxGeom*, GameObject*> geoms;
 
+    //ofLight tmpLight;
+
     //Player
     Player* player;
 
@@ -45,6 +47,8 @@ private:
 
     //DEBUG
     void TestScene();
+    void BlanckScene();
+    ofLight dirLight;
 
     void SetupWorld();
     void SetupPhysics();
@@ -57,6 +61,7 @@ private:
     std::map<GameObject*, bool> undelteableObj;
 
     int numOfTrucks = 0;
+    int numOfPlatforms = 0;
 };
 
 #endif // WORLD_H

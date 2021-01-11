@@ -6,7 +6,10 @@ ofApp *myApp;
 
 //========================================================================
 int main( ){
+    ofGLWindowSettings settings;
+    settings.setSize(1024, 768);
+    settings.setGLVersion(3,3);
+    ofCreateWindow(settings);
     myApp = new ofApp();
-    ofSetupOpenGL(1024,768,OF_WINDOW);
-    ofRunApp(myApp);
+    return ofRunApp(myApp);
 }

@@ -8,6 +8,7 @@ GameObject::GameObject(dWorldID w, dSpaceID s) : name("UNNAMED"), position(0.0f,
     SetupPhysics(w, s);
 }
 
+
 GameObject::~GameObject(){
     dBodyDestroy(body);
     dGeomDestroy(geom);
@@ -50,6 +51,7 @@ void GameObject::SetScaling(ofVec3f scale){
     dGeomDestroy(geom);//destory current geom
     geom = dCreateBox(space, scale.x, scale.y, scale.z);
     dGeomSetBody(geom, body);//Link Geom To Body
+
 }
 
 /*
@@ -60,6 +62,7 @@ void GameObject::SetRotation(ofQuaternion rotation){
     rotation.getRotate(rotationAmount, rotationAngle);
     const dReal newRot[4] = {rotation.w(), rotation.x(),rotation.y(), rotation.z()};
     dBodySetQuaternion(body, newRot);
+
 }
 
 /*
@@ -67,12 +70,11 @@ void GameObject::SetRotation(ofQuaternion rotation){
  */
 void GameObject::Rotate(ofVec3f rotationAxis, float amount){
 
-
-
     rotation *= glm::angleAxis(glm::radians(amount), glm::vec3(rotationAxis));
 
-    const dReal odeRot[4] = {rotation.w(), rotation.x(),rotation.y(), rotation.z()};
-    dBodySetQuaternion(body, odeRot);
+    const dReal newRot[4] = {rotation.w(), rotation.x(),rotation.y(), rotation.z()};
+    dBodySetQuaternion(body, newRot);
+
 }
 
 
@@ -116,3 +118,28 @@ void GameObject::SetMass(dReal newMass){
     dBodySetMass(body, &mass);
 }
 
+/*
+ * Set Texture
+ */
+void GameObject::SetTexture(std::string path){
+    texture = *new ofTexture();
+    if(!ofLoadImage(texture, path)) { std::cerr << "Failed to load ground texture." << std::endl; }
+
+    texture.setTextureWrap(GL_REPEAT, GL_REPEAT);
+    isTextured = true;
+}
+
+/*
+ * Set Texture
+ */
+void GameObject::SetTexture(ofTexture tex){
+    texture = tex;
+
+    texture.setTextureWrap(GL_REPEAT, GL_REPEAT);
+    isTextured = true;
+}
+
+void GameObject::SetMaterial(ofMaterial* material){
+    this->material = material;
+    hasMaterial = true;
+}

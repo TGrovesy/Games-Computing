@@ -16,10 +16,18 @@ public:
     virtual void Update(float deltaTime) = 0;
     virtual void Draw() = 0;
 
+    //Rendering
+    void SetTexture(std::string path);
+    void SetTexture(ofTexture tex);
+    ofTexture& GetTexture(){return texture;}
+    void SetTextureScale(float value){textureScale = value;}
+
+    void SetMaterial(ofMaterial* material);
+
     //Transform Stuff
     void SetPosition(ofVec3f pos);
     ofVec3f GetPosition(){return position;}
-    void SetScaling(ofVec3f scale);
+    virtual void SetScaling(ofVec3f scale);
     void SetRotation(ofQuaternion rotation);
     void Rotate(ofVec3f rotationAxis, float amount);
     ofVec3f GetScale()  { return scale; }
@@ -44,13 +52,23 @@ public:
     void SetMass(dReal newMass);
 
 
+
+
 protected:
     //Transforms
-    ofVec3f position;
-    ofVec3f scale;
-    ofQuaternion rotation;
-    ofVec3f rotationAngle;
-    float rotationAmount;
+    ofVec3f position = ofVec3f(0,0,0);
+    ofVec3f scale = ofVec3f(1,1,1);;
+    ofQuaternion rotation = ofQuaternion(0.f, 0.0f, 1.0f, 0.0f);
+    ofVec3f rotationAngle = ofVec3f(0,1,0);
+    float rotationAmount = 0.f;
+
+    //Rendering
+    ofTexture& texture = *new ofTexture();
+    float textureScale = 1;
+    bool isTextured = false;
+
+    ofMaterial* material;
+    bool hasMaterial = false;
 
     //ODE
     dWorldID world;
@@ -63,7 +81,7 @@ protected:
     bool isKinematic = false;
 
     //Identifiers
-    std::string name;
+    std::string name = "UNNAMED";
 
 
 };

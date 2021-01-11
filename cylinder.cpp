@@ -5,9 +5,6 @@ Cylinder::Cylinder(dWorldID w, dSpaceID s, float radius, float length) : GameObj
     this->radius = radius;
     this->length = length;
     SetupPhysics();
-    //TODO MOVE TO PROPER TEXTURE SYSTEM
-    if(!ofLoadImage(texture, "dirt2.jpg")) { std::cerr << "Failed to load ground texture." << std::endl; }
-    texture.setTextureWrap(GL_REPEAT, GL_REPEAT);
 }
 
 Cylinder::~Cylinder(){
@@ -38,15 +35,19 @@ void Cylinder::SetupPhysics(){
 }
 
 void Cylinder::Draw(){
-    //front left wheel
-    ofPushMatrix();
 
-    texture.bind();//bind texture
+    ofPushMatrix();
     ofTranslate(ofVec3f(position.x, position.y, position.z));
     ofRotateDeg(rotationAmount, rotationAngle.x, rotationAngle.y, rotationAngle.z);
+    if(isTextured) texture.bind();
+    if(hasMaterial)material->begin();
     ofDrawCylinder(0,0,0, this->radius, this->length);
-    texture.unbind();//unbind texture
+    if(hasMaterial) material->end();
+    if(isTextured) texture.unbind();
     ofPopMatrix();
+
+
+
 }
 
 

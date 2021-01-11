@@ -7,13 +7,9 @@ Player::Player(dWorldID w, dSpaceID s) : GameObject(w, s), horizontalAngle(0.0f)
 
 void Player::SetupCamera(){
     // Set up the OpenFrameworks camera
-    //ofVec3f upVector;
-    //upVector.set(0, 0, 1);
     camera.setGlobalPosition(position.x, position.y, position.z);
     camera.setFov(90);
     camera.setNearClip(0.01f);
-    //camera.lookAt({0,0,0}, ofVec3f(0,0,1));
-    std::cout << "here\n";
 }
 
 void Player::Update(float deltaTime){

@@ -18,7 +18,6 @@ private:
     float radius;
     float length;
 
-    ofTexture texture;
 };
 
 #endif // CYLINDER_H
