@@ -146,22 +146,36 @@ void GameObject::SetTexture(ofTexture* tex){
     isTextured = true;
 }
 
+
+/*
+ *  Set Objects Rendering Material
+ */
 void GameObject::SetMaterial(ofMaterial* material){
     this->material = material;
     hasMaterial = true;
 }
 
 
+/*
+ * Set Objects Torque
+ */
 void GameObject::SetTorque(float x, float y, float z){
     dBodySetTorque(body, x, y, z);
     dBodySetAngularVel(body,x,y,z);
 }
 
+
+/*
+ * Set Objects Force
+ */
 void GameObject::SetForce(float x, float y, float z){
     dBodySetForce(body, x, y, z);
     dBodySetLinearVel(body,x,y,z);
 }
 
+/*
+ * Disable the rigid body
+ */
 void GameObject::DisableBody(){
     dBodyDisable(body);
     dGeomDisable(geom);

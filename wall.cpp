@@ -14,7 +14,7 @@ void Wall::Update(float deltaTime){
 
     ofVec3f playerPos = ofApp::GetWorld()->GetPlayer()->GetPosition();
     float xDistance = position.x - playerPos.x;
-    if(speed >= 1.5f)speed = 1.5f;
+    if(speed >= 1.1f)speed = 1.1f;
     if(xDistance > 150) speed = 4.0f;
     position.x += speed;//TODO add acceleration
     speed += 0.005f;

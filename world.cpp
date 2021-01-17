@@ -18,13 +18,16 @@ World::World()
 
 void World::SetupWorld(){
     srand(time(0));
+    //Material and Texture Handlers
     Material* material = new Material();
     Texture* texture = new Texture();
     SetupPhysics();
+    //Scenes
     TestScene();
     //BlanckScene();
 }
 
+//Dispose of all ODE data
 World::~World(){
     for(int i = 0; i < (int)gameObjects.size(); i++){
         gameObjects.at(i)->~GameObject();
@@ -38,6 +41,9 @@ World::~World(){
     dCloseODE();
 }
 
+/*
+ *Sets up all necessary stuff for an ODE simulation
+ */
 void World::SetupPhysics(){
     //ODE setup Create world
     dInitODE2(0);
@@ -46,9 +52,6 @@ void World::SetupPhysics(){
     this->contactGroup = dJointGroupCreate(0);
     dWorldSetGravity(this->worldID, 0, 0, gravityValue);
 
-    //DEBUG REMOVE AND REPLACE WITH PROPER GROUND
-    //groundTMP = dCreatePlane(this->spaceID, 0, 0, 1, 0);//THIS IS WHAT COLLIDES
-    //dWorldSetDamping (worldID, 0.03,0.03);
     dSpaceCollide(spaceID, 0, &nearCallback);
     dAllocateODEDataForThread(dAllocateMaskAll);
 }
@@ -69,9 +72,9 @@ static void nearCallback(void *, dGeomID o1, dGeomID o2){
 
 }
 
-//TODO INCORRECT JUMP METHOD CHANGE THIS
+//Temp Jump Fix
 bool hasJumped = false;
-bool doubleJump = false;
+//Controlls Collsions
 void World::collide(dGeomID o1, dGeomID o2){
     int i,n;
     GameObject* object1 = geoms.find(o1)->second;
@@ -90,43 +93,22 @@ void World::collide(dGeomID o1, dGeomID o2){
         dContactSoftERP | dContactSoftCFM | dContactApprox1;
       contact[i].surface.mu = 1;
 
-      contact[i].surface.slip1 = 0.1;
-      contact[i].surface.slip2 = 0.1;
-      contact[i].surface.soft_erp = 0.5;
-      contact[i].surface.soft_cfm = 0.3;
+      //Controlls Surface Friction
+      contact[i].surface.slip1 = 0.2;//Friction DIR 1
+      contact[i].surface.slip2 = 0.2;//Friction DIR 2
+      contact[i].surface.soft_erp = 0.3;
+      contact[i].surface.soft_cfm = 0.1;
       dJointID c = dJointCreateContact (worldID,contactGroup,&contact[i]);
       dJointAttach (c,
                     dGeomGetBody(contact[i].geom.g1),
                     dGeomGetBody(contact[i].geom.g2));
       }
     }
-
-/*
-
-    //OBJECT EXAMPLE TEST DEBUG REMOVE
-    if((object1->GetGeom() == player->GetGeom() || object2->GetGeom() == player->GetGeom()) && object1 != object2 ){//contact check for "ground" check NEEDS MOVING
-        if((object1->GetName() != "Ground" && object2->GetName() != "Ground") && (object1->GetName() != "Wall" && object2->GetName() != "Wall")){
-            if(ofApp::keyDown[32]&&!hasJumped){//TODO Add on ground check
-                //TODO BUG! multiple collisions lead to multiple forces added meaning super high jump
-                dBodyAddForce(player->GetBody(), 0, 0, 70);
-                hasJumped = true;
-                std::cout << "o1: " << object1->GetName() << ", o2: " << object2->GetName() << std::endl;
-            }
-        }
-    }
-
-
-    if(!ofApp::keyDown[32]) hasJumped = false;*/
 }
 
 void World::Draw(){
 
     player->FrameBegin();//Start Of Frame
-    //dirLight.draw();
-    //Draw Axis
-    ofSetColor(ofColor::lightGrey);
-    //ofDrawGrid(0.5f, 100, false, false,false,true);
-    ofDrawAxis(10);
     for(int i = 0; i < (int)gameObjects.size(); i++){
         gameObjects.at(i)->Draw();
     }
@@ -134,11 +116,15 @@ void World::Draw(){
 
    player->FrameEnd();//End Of frame
 
+   //Some usful GUI info
    ofDrawBitmapStringHighlight("Use WASD for movement\n Space for Jump\nP to Play/Restart on death", 20,20);
    std::string scoreStr = "Score: "  + std::to_string(score);
    ofDrawBitmapStringHighlight(scoreStr, 20,80);
 }
 
+/*
+ * Update function for physics and game mechanics simulation
+ */
 void World::Update(float deltaTime){
     objsMovedOnUpdate = 0;
     if(!gameStart && ofApp::keyDown['p']) gameStart = true;//starts game by pressing P!
@@ -147,12 +133,12 @@ void World::Update(float deltaTime){
 
         geoms.clear();//delete previous map
 
-        float jumpDev = 1.25f;
+        float jumpDev = 0.75f;//Leanancy for player mistake
 
 
         for(int i = 0; i < (int)gameObjects.size(); i++){
             GameObject* obj = gameObjects.at(i);
-            obj->Update(deltaTime);
+            obj->Update(deltaTime);//Update object
             geoms.insert(pair<dxGeom*, GameObject*>(obj->GetGeom(), obj));//links geom to gameobject
 
             //Jump Check
@@ -168,7 +154,7 @@ void World::Update(float deltaTime){
                                     break;
                                 }
                                 //TODO BUG! multiple collisions lead to multiple forces added meaning super high jump
-                                dBodyAddForce(player->GetBody(), 0, 0, 70);
+                                dBodyAddForce(player->GetBody(), 0, 0, 55);
 
                                 jumpSound.play();
                                 hasJumped = true;
@@ -177,12 +163,13 @@ void World::Update(float deltaTime){
                     }
                 }
             }
-            GamemodeCheck(obj);
+            GamemodeCheck(obj);//Check object is in correct position for gamemode
 
         }
 
         if(!ofApp::keyDown[32]) hasJumped = false;
 
+        //Calculate player score
         score = (player->GetPosition().z + player->GetPosition().x) / 10;//height and distance from origin
 
         //Check game over
@@ -206,7 +193,7 @@ void World::Update(float deltaTime){
 
         //GamemodeGeneration();
         dSpaceCollide (this->spaceID, 0, &nearCallback);
-        dWorldQuickStep (this->worldID, 0.15); //Simulates physics step forward (QUICK STEP FOR BIG PERFORMANCE BOOST)
+        dWorldQuickStep (this->worldID, 0.11); //Simulates physics step forward (QUICK STEP FOR BIG PERFORMANCE BOOST)
 
         dJointGroupEmpty(contactGroup);//Remove all contact joints
     }
@@ -221,13 +208,16 @@ void World::Update(float deltaTime){
 }
 
 
+/*
+ * Moves gameobjects as needed to create an endless runner
+ */
 void World::GamemodeCheck(GameObject* obj){
 
 
     map<GameObject*, bool>::iterator it = undelteableObj.find(obj);
     if((obj->GetPosition().x < (gameWall->GetPosition().x - 10) || obj->GetPosition().x < (player->GetPosition().x - 100)) && it == undelteableObj.end()){
         //Check if truck
-        if(obj->GetName() == "Truck"){//Deleteing and recreating object was way too inefficent for truck and caused stuttering
+        if(obj->GetName() == "Truck"){
 
             ofVec3f curPos = obj->GetPosition();
             float randY = ofRandom(-roadWidth/2, roadWidth/2);
@@ -279,6 +269,9 @@ void World::GamemodeCheck(GameObject* obj){
     }
 }
 
+/*
+ * Brings game back into a "Starting State"
+ */
 void World::GameReset(){
 
     int truck = 0;
@@ -330,37 +323,10 @@ void World::GameReset(){
     gameWall->SetPosition(ofVec3f(-200,0,gameWall->GetScale().z / 2));
 }
 
-/*
-void World::GamemodeGeneration(){
-    if(numOfTrucks < 15){//TODO const value for trucks
-        dSpaceID vSpace = dSimpleSpaceCreate(spaceID);
-        dSpaceSetCleanup(vSpace, 0);
-        Vehicle* truck = new Vehicle(this->worldID, vSpace, 0);
-        truck->SetPosition(ofVec3f(gameWall->GetPosition().x + 500, -5, 10));
-        truck->SetName("Truck");
-        truck->SetScaling(ofVec3f(1, 1, 1));
-        numOfTrucks++;
-        gameObjects.push_back(truck);
-    }
-
-    if(numOfPlatforms < 15){//TODO const value for trucks
-        FlyingCar* platform = new FlyingCar(this->worldID, this->spaceID);
-
-        platform->SetPosition(ofVec3f(gameWall->GetPosition().x + 500, -5, 35));
-
-        platform->SetFixedPosition(platform->GetPosition(), 4);
-        platform->SetName("Platform");
-        platform->SetScaling(ofVec3f(10, 10, 1));
-        platform->SetMass(100000);
-        platform->DisableGravity();
-        numOfPlatforms++;
-        gameObjects.push_back(platform);
-    }
-}*/
 
 
 
-
+//Empty Scene for testing
 void World::BlanckScene(){
 
     //SCENE CONSTRUCTION!!! TODO MOVE!
@@ -493,7 +459,7 @@ void World::TestScene(){
     dirLight.setDirectional();
     dirLight.setSpecularColor(ofColor(255));
     dirLight.setDiffuseColor(ofColor(255));
-    dirLight.setAmbientColor(ofColor(128));
+    dirLight.setAmbientColor(ofColor(64));
     dirLight.tiltDeg(-45);
     dirLight.setup();
     dirLight.enable();
@@ -547,6 +513,7 @@ void World::TestScene(){
     for(int i = 0; i < 8; i++){
         float randY = ofRandom((-roadWidth / 2) + 1, (roadWidth / 2) - 1);
         Cube* ramp = new Cube(worldID, spaceID, 15, 35, 3);
+        ramp->SetColour(ofColor::blanchedAlmond);
         ramp->SetPosition(ofVec3f((i * 10) + 20, randY, 1));
         ramp->Rotate(ofVec3f(0,1,0), -22.5f);
         ramp->SetName("Ramp");
@@ -563,16 +530,6 @@ void World::TestScene(){
     player->SetScaling(ofVec3f(1, 1, 3));
     player->SetMass(100);
     player->SetName("Player");
-    //player->SetKinematic(true);
-    //TODO: DEBUG TO TEST REMOVE!
-    for(int i = 0; i < 2; i++){
-        Cube* cube = new Cube(this->worldID, this->spaceID, 5,5,5);
-        cube->SetMass(1000);
-        cube->SetPosition(ofVec3f(50, 50, ((float)i * 5) + 2.55));
-        cube->SetTexture("metal.jpg");
-        cube->SetMaterial(Material::GetMaterial("chrome"));
-        gameObjects.push_back(cube);
-    }
 
 
     //Trucks
@@ -590,7 +547,7 @@ void World::TestScene(){
             //truck->Rotate(ofVec3f(0,0,1), -12.5f);
         }
         truck->SetName("Truck");
-        truck->SetScaling(ofVec3f(16, 9, 9));
+        truck->SetScaling(ofVec3f(15, 8, 8));
         truck->SetPlayerJump(true);
 
 
