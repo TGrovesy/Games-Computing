@@ -1,5 +1,9 @@
 #include "cube.h"
 
+Cube::Cube(float x, float y, float z) : GameObject(){
+    SetScaling(ofVec3f(x,y,z));
+}
+
 Cube::Cube(dWorldID w, dSpaceID s, float x, float y, float z) : GameObject(w,s)
 {
     SetScaling(ofVec3f(x,y,z));
@@ -20,14 +24,6 @@ void Cube::Draw(){
     //COLOUR
 
     ofSetColor(this->colour);
-/*
-    ofPushMatrix();
-    if(isTextured)texture.bind();
-    ofTranslate(position);
-    ofRotateDeg(rotationAmount, rotationAngle.x, rotationAngle.y, rotationAngle.z);
-    ofDrawBox(0,0,0, GetScale().x, GetScale().y, GetScale().z);
-    if(isTextured)texture.unbind();
-    ofPopMatrix();*/
 
     ofBoxPrimitive b;
 
@@ -42,14 +38,14 @@ void Cube::Draw(){
 
     if(isTextured){
         //texture.draw(texturePoints[0],texturePoints[1],texturePoints[2],texturePoints[3]);
-        b.mapTexCoords(0,0,textureScale,textureScale);
-        texture.bind();
+        b.mapTexCoords(0,0,textureScale.x,textureScale.y);
+        texture->bind();
     }
     if(hasMaterial) material->begin();
     // Draw it:
     b.draw();
     if(hasMaterial)material->end();
-    if(isTextured)texture.unbind();
+    if(isTextured)texture->unbind();
 }
 
 void Cube::SetColour(ofColor colour){

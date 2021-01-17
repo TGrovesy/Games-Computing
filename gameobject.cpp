@@ -1,28 +1,33 @@
 #include "gameobject.h"
 
 GameObject::GameObject(){
-
+    hasBody = false;
 }
 
 GameObject::GameObject(dWorldID w, dSpaceID s) : name("UNNAMED"), position(0.0f, 0.0f, 0.0f), scale(1.0f, 1.0f, 1.0f), rotation(0.f, 0.0f, 1.0f, 0.0f), rotationAmount(0.0f){
+    hasBody = true;
     SetupPhysics(w, s);
 }
 
 
 GameObject::~GameObject(){
-    dBodyDestroy(body);
-    dGeomDestroy(geom);
+    if(hasBody){
+        dBodyDestroy(body);
+        dGeomDestroy(geom);
+    }
 }
 
 /*
 Used for updateing the physics
 */
 void GameObject::Update(float deltaTime){
-    const dReal* pos = dBodyGetPosition(body);
-    const dReal* rot = dBodyGetQuaternion(body);
-    position = ofVec3f(pos[0], pos[1], pos[2]);
-    rotation = ofQuaternion(rot[1], rot[2], rot[3], rot[0]);
-    rotation.getRotate(rotationAmount, rotationAngle);
+    if(hasBody){
+        const dReal* pos = dBodyGetPosition(body);
+        const dReal* rot = dBodyGetQuaternion(body);
+        position = ofVec3f(pos[0], pos[1], pos[2]);
+        rotation = ofQuaternion(rot[1], rot[2], rot[3], rot[0]);
+        rotation.getRotate(rotationAmount, rotationAngle);
+    }
 }
 
 /*
@@ -39,7 +44,7 @@ void GameObject::SetPosition(ofVec3f pos){
     //std::cout << "pos set: " << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
     this->position = pos;
 
-    dBodySetPosition(body, position.x, position.y, position.z);//set body position ODE
+    if(hasBody)dBodySetPosition(body, position.x, position.y, position.z);//set body position ODE
 }
 
 /*
@@ -47,11 +52,12 @@ Set Object Scaleing
 */
 void GameObject::SetScaling(ofVec3f scale){
     this->scale = scale;
-    //ODE SCALE
-    dGeomDestroy(geom);//destory current geom
-    geom = dCreateBox(space, scale.x, scale.y, scale.z);
-    dGeomSetBody(geom, body);//Link Geom To Body
-
+    if(hasBody){
+        //ODE SCALE
+        dGeomDestroy(geom);//destory current geom
+        geom = dCreateBox(space, scale.x, scale.y, scale.z);
+        dGeomSetBody(geom, body);//Link Geom To Body
+    }
 }
 
 /*
@@ -71,9 +77,10 @@ void GameObject::SetRotation(ofQuaternion rotation){
 void GameObject::Rotate(ofVec3f rotationAxis, float amount){
 
     rotation *= glm::angleAxis(glm::radians(amount), glm::vec3(rotationAxis));
-
-    const dReal newRot[4] = {rotation.w(), rotation.x(),rotation.y(), rotation.z()};
-    dBodySetQuaternion(body, newRot);
+    if(hasBody){
+        const dReal newRot[4] = {rotation.w(), rotation.x(),rotation.y(), rotation.z()};
+        dBodySetQuaternion(body, newRot);
+    }
 
 }
 
@@ -122,24 +129,41 @@ void GameObject::SetMass(dReal newMass){
  * Set Texture
  */
 void GameObject::SetTexture(std::string path){
-    texture = *new ofTexture();
-    if(!ofLoadImage(texture, path)) { std::cerr << "Failed to load ground texture." << std::endl; }
+    texture = new ofTexture();
+    if(!ofLoadImage(*texture, path)) { std::cerr << "Failed to load ground texture." << std::endl; }
 
-    texture.setTextureWrap(GL_REPEAT, GL_REPEAT);
+    texture->setTextureWrap(GL_REPEAT, GL_REPEAT);
     isTextured = true;
 }
 
 /*
  * Set Texture
  */
-void GameObject::SetTexture(ofTexture tex){
+void GameObject::SetTexture(ofTexture* tex){
     texture = tex;
 
-    texture.setTextureWrap(GL_REPEAT, GL_REPEAT);
+    texture->setTextureWrap(GL_REPEAT, GL_REPEAT);
     isTextured = true;
 }
 
 void GameObject::SetMaterial(ofMaterial* material){
     this->material = material;
     hasMaterial = true;
+}
+
+
+void GameObject::SetTorque(float x, float y, float z){
+    dBodySetTorque(body, x, y, z);
+    dBodySetAngularVel(body,x,y,z);
+}
+
+void GameObject::SetForce(float x, float y, float z){
+    dBodySetForce(body, x, y, z);
+    dBodySetLinearVel(body,x,y,z);
+}
+
+void GameObject::DisableBody(){
+    dBodyDisable(body);
+    dGeomDisable(geom);
+    hasBody = false;
 }

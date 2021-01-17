@@ -1,12 +1,13 @@
 #include "vehicle.h"
+#include"ofApp.h"
 #include "material.h"
 #include "texture.h"
 #include<time.h>
 
-#define VEHICLE_LENGTH 10
-#define VEHICLE_WIDTH 5
-#define VEHICLE_HEIGHT 5
-#define WHEEL_RADIUS 1.5
+#define VEHICLE_LENGTH 15
+#define VEHICLE_WIDTH 8
+#define VEHICLE_HEIGHT 8
+#define WHEEL_RADIUS 3
 #define WHEEL_MASS 100
 #define VMASS 1000
 
@@ -43,15 +44,16 @@ void Vehicle::SetupBody(dWorldID worldID, dSpaceID spaceID){
     chasis->SetName("Truck");
     chasis->SetTexture("metal.jpg");
     chasis->SetMaterial(Material::GetMaterial("chrome"));
+    chasis->SetPlayerJump(true);
 
     if(lightsEnabled){
         //headlights
-        for(int i = 0; i < 2; i++){
+        for(int i = 0; i < 1; i++){
             headlights[i] = new ofLight();
             headlights[i]->rotateDeg(-90, glm::vec3(0, 1, 0));
 
-            headlights[i]->setPosition(ofVec3f(chasis->GetPosition().x + (VEHICLE_LENGTH / 2) + 1, chasis->GetPosition().y, chasis->GetPosition().z - 2.5));
-            if(i == 1)headlights[i]->setPosition(ofVec3f(chasis->GetPosition().x + (VEHICLE_LENGTH / 2) + 1, chasis->GetPosition().y, chasis->GetPosition().z + 2.5));
+            headlights[i]->setPosition(ofVec3f(chasis->GetPosition().x + 1, chasis->GetPosition().y, chasis->GetPosition().z - 2.5));
+            //if(i == 1)headlights[i]->setPosition(ofVec3f(chasis->GetPosition().x + (VEHICLE_LENGTH / 2) + 1, chasis->GetPosition().y, chasis->GetPosition().z + 2.5));
             headlights[i]->setSpotlight(20, 64);
             headlights[i]->setDiffuseColor(ofFloatColor::yellow);
             headlights[i]->setup();
@@ -63,9 +65,10 @@ void Vehicle::SetupBody(dWorldID worldID, dSpaceID spaceID){
     for(int i = 0; i < 4; i++){
         wheels[i] = new Cylinder(world, space, 1.5, 2);
         wheels[i]->SetMass(WHEEL_MASS);
-        wheels[i]->SetName("Wheel");
-        wheels[i]->SetTexture("adam.jpg");
+        wheels[i]->SetName("Truck");
+        wheels[i]->SetTexture("tire2.jpg");
         wheels[i]->SetMaterial(Material::GetMaterial("rubber"));
+
     }
 
     wheels[0]->SetColour(ofColor::brown);
@@ -105,34 +108,30 @@ void Vehicle::SetupBody(dWorldID worldID, dSpaceID spaceID){
         dJointSetHinge2Param(wheelJoint[i], dParamHiStop, 0);
     }
 
-    SetSpace(space);
 
-    //Collision fix
-    for(int i = 0; i < 4; i++){
-        //dBodySetLinearDampingThreshold(wheels[i]->GetBody(), 0.02);
-    }
 }
 
 
 void Vehicle::Update(float deltaTime){
 
+
     int randomNumber;
     randomNumber = (rand()) % 2;
     if(randomNumber == 0){
-        speed += 0.1f;
+        speed += 0.05f;
     }else{
-        speed -= 0.05f;
+        speed -= 0.025f;
     }
 
-    if(speed < 1) speed =1;//ensures minimum speed
-    if(speed > 15) speed = 15;
+    if(speed < minSpeed) speed = minSpeed;//ensures minimum speed
+    if(speed > maxSpeed) speed = maxSpeed;
 
     //speed stuff
     dJointSetHinge2Param(wheelJoint[2], dParamVel2, -speed);//TODO CHANGE TO SPEED!
-    dJointSetHinge2Param(wheelJoint[2], dParamFMax2, 10.1);
+    dJointSetHinge2Param(wheelJoint[2], dParamFMax2, 5);
     dJointSetHinge2Param(wheelJoint[3], dParamVel2, -speed);
-    dJointSetHinge2Param(wheelJoint[3], dParamFMax2, 10.1);
-
+    dJointSetHinge2Param(wheelJoint[3], dParamFMax2, 5);
+/*
     //std::cout<<name<<std::endl;
     // steering
     // Clamp vertical angle to [-85, 85] degrees
@@ -145,8 +144,8 @@ void Vehicle::Update(float deltaTime){
         steer -= 0.01f;
     }
 
-    if(steer > 1)steer = 1;
-    if(steer < -1) steer = -1;
+    if(steer > 0.8)steer = 0.8f;
+    if(steer < -0.8) steer = -0.8f;*/
 
     steer = std::max(-4.0f, std::min(4.0f, steer));
     dReal v = steer - dJointGetHinge2Angle1 (wheelJoint[0]);
@@ -169,10 +168,9 @@ void Vehicle::Update(float deltaTime){
     }
 
 
-
-
     this->position = chasis->GetPosition();
     dBodySetPosition(body, position.x, position.y, position.z);
+
 }
 
 void Vehicle::Draw(){
@@ -186,16 +184,17 @@ void Vehicle::Draw(){
     }
 
     if(lightsEnabled){
-        for(int i =0; i < 2;  i++){
+        for(int i =0; i < 1;  i++){
             headlights[i]->setPosition(ofVec3f(chasis->GetPosition().x + (VEHICLE_LENGTH / 2) + 1, chasis->GetPosition().y, chasis->GetPosition().z - 2.5));
-            if(i == 1)headlights[i]->setPosition(ofVec3f(chasis->GetPosition().x + (VEHICLE_LENGTH / 2) + 1, chasis->GetPosition().y, chasis->GetPosition().z + 2.5));
+            //if(i == 1)headlights[i]->setPosition(ofVec3f(chasis->GetPosition().x + (VEHICLE_LENGTH / 2) + 1, chasis->GetPosition().y, chasis->GetPosition().z + 2.5));
             //headlights[i]->draw();
         }
     }
 }
 
 void Vehicle::SetPosition(ofVec3f pos){
-    this->position = pos;
+    GameObject::SetPosition(pos);
+    //this->position = pos;
     chasis->SetPosition(position);
     //front left wheel
     wheels[0]->SetPosition(ofVec3f(position.x + (0.5 * VEHICLE_LENGTH), position.y - (VEHICLE_WIDTH * 0.5), position.z - (VEHICLE_HEIGHT * 0.5)));
@@ -205,8 +204,13 @@ void Vehicle::SetPosition(ofVec3f pos){
     wheels[2]->SetPosition(ofVec3f(position.x - (0.5 * VEHICLE_LENGTH), position.y - (VEHICLE_WIDTH * 0.5), position.z - (VEHICLE_HEIGHT * 0.5)));
     //back right wheel
     wheels[3]->SetPosition(ofVec3f(position.x - (0.5 * VEHICLE_LENGTH), position.y + (VEHICLE_WIDTH * 0.5), position.z - (VEHICLE_HEIGHT * 0.5)));
+
 }
 
+
+ofVec3f Vehicle::GetPosition(){
+    return chasis->GetPosition();
+}
 
 void Vehicle::Rotate(ofVec3f rot, float amount){
     chasis->Rotate(rot, amount);
@@ -215,13 +219,19 @@ void Vehicle::Rotate(ofVec3f rot, float amount){
     }
 }
 
+void Vehicle::SetRotation(ofQuaternion rotation){
+    GameObject::SetRotation(rotation);
+
+    chasis->SetRotation(rotation);
+}
+
 void Vehicle::SetScaling(ofVec3f scale){
     GameObject::SetScaling(scale);
     this->scale = scale;
-    chasis->SetScaling(chasis->GetScale() * scale);
+    /*chasis->SetScaling(chasis->GetScale() * scale);
     for(int i = 0; i < 4; i++){
         wheels[i]->SetScaling(wheels[i]->GetScale() * scale);
-    }
+    }*/
 }
 
 /*
@@ -241,10 +251,51 @@ void Vehicle::SetKinematic(bool value){
 }
 
 void Vehicle::SetSpace(dSpaceID sp){
-    dSpaceAdd(sp, chasis->GetGeom());
+    dSpaceAdd(sp, geom);
+    /*dSpaceAdd(sp, chasis->GetGeom());
     for(int i = 0; i < 4; i++){
         dSpaceAdd(sp, wheels[i]->GetGeom());
-    }
+    }*/
 }
 
 
+void Vehicle::SetTorque(float x, float y, float z){
+    GameObject::SetTorque(x,y,z);
+    dBodySetTorque(chasis->GetBody(), x, y, z);
+    for(int i = 0; i < 4; i++){
+        wheels[i]->SetTorque(x,y,z);
+    }
+
+}
+
+void Vehicle::SetForce(float x, float y, float z){
+    GameObject::SetForce(x,y,z);
+    chasis->SetForce(x,y,z);
+    for(int i = 0; i < 4; i++){
+        wheels[i]->SetForce(x,y,z);
+    }
+
+}
+
+dxGeom* Vehicle::GetGeom(){
+    return chasis->GetGeom();
+}
+
+void Vehicle::EnableLights(bool value){
+    lightsEnabled = value;
+    if(lightsEnabled == true){
+        //headlights
+        for(int i = 0; i < 1; i++){
+            headlights[i] = new ofLight();
+            headlights[i]->rotateDeg(-90, glm::vec3(0, 1, 0));
+
+            headlights[i]->setPosition(ofVec3f(chasis->GetPosition().x + 1, chasis->GetPosition().y, chasis->GetPosition().z - 2.5));
+            //if(i == 1)headlights[i]->setPosition(ofVec3f(chasis->GetPosition().x + (VEHICLE_LENGTH / 2) + 1, chasis->GetPosition().y, chasis->GetPosition().z + 2.5));
+            headlights[i]->setSpotlight(20, 64);
+            headlights[i]->setDiffuseColor(ofFloatColor::yellow);
+            headlights[i]->setup();
+            headlights[i]->enable();
+        }
+
+    }
+}

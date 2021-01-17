@@ -6,6 +6,7 @@
 class Cube : public GameObject
 {
 public:
+    Cube(float x, float y, float z);
     Cube(dWorldID w, dSpaceID s, float x, float y, float z);
     ~Cube();
 

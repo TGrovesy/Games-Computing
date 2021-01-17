@@ -12,10 +12,11 @@ public:
     virtual void Update(float deltaTime);
     virtual void Draw();
 
-    //void SetColour(ofColor colour);
+
+    void SetSpeed(float value){speed = value;}
 
 protected:
-    ofColor colour = ofColor::mediumPurple;
+    float speed = 0.15f;
 };
 
 #endif // WALL_H

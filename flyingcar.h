@@ -11,6 +11,8 @@ public:
     virtual void Update(float deltaTime);
     virtual void Draw();
 
+    void SetPosition(ofVec3f pos);
+
     void SetFixedPosition(ofVec3f pos, float maxDeviation);
     void SetFixedHeight(float value){fixedHeight = value;}
 
@@ -20,7 +22,7 @@ private:
     void SetupBody(dWorldID worldID, dSpaceID spaceID);
     void ForceUpright();
 
-    float maxDeviation = 3.0f;
+    float maxDeviation = 2.0f;
 };
 
 #endif // FLYINGCAR_H

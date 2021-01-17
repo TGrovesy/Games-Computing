@@ -28,23 +28,27 @@ void ofApp::update(){
     ofVec3f lookat = player->camera.getLookAtDir() * 0.5f;
     ofVec3f side = player->camera.getSideDir() * 0.5f;
 
-    if(keyDown['w']){
-        ofVec3f t = player->GetPosition();
-        t += 0.5f * player->camera.getLookAtDir();
-        //player->SetPosition(t);
-        dBodyAddForce(player->GetBody(), lookat.x, lookat.y, 0);
-    }
+    float xSpeed = dBodyGetLinearVel(player->GetBody())[0];
 
-    if(keyDown['s']){
-        dBodyAddForce(player->GetBody(), -lookat.x, -lookat.y, 0);
-    }
+    if(xSpeed < 30){
+        if(keyDown['w']){
+            ofVec3f t = player->GetPosition();
+            t += 0.5f * player->camera.getLookAtDir();
+            //player->SetPosition(t);
+            dBodyAddForce(player->GetBody(), lookat.x, lookat.y, 0);
+        }
 
-    if(keyDown['a']){
-        dBodyAddForce(player->GetBody(), -side.x, -side.y, 0);
-    }
+        if(keyDown['s']){
+            dBodyAddForce(player->GetBody(), -lookat.x, -lookat.y, 0);
+        }
 
-    if(keyDown['d']){
-        dBodyAddForce(player->GetBody(), side.x, side.y, 0);
+        if(keyDown['a']){
+            dBodyAddForce(player->GetBody(), -side.x, -side.y, 0);
+        }
+
+        if(keyDown['d']){
+            dBodyAddForce(player->GetBody(), side.x, side.y, 0);
+        }
     }
 
 
@@ -85,14 +89,22 @@ void ofApp::keyReleased(int key){
 
 
 int prevMouseX = 0, prevMouseY = 0;
-float horizontalAngle = 0, verticalAngle = 0;
+float horizontalAngle = 0, verticalAngle = 90;
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
     //TODO MOVE TO PLAYER FILE
     int dX = x - prevMouseX;
     int dY = y - prevMouseY;
     world->GetPlayer()->Rotate(ofVec3f(0,0,1), -dX * 0.25f);
-    world->GetPlayer()->Rotate(world->GetPlayer()->camera.getSideDir(), -dY * 0.25f);//vertical
+    if(verticalAngle > 22.5 && verticalAngle < 180){
+        world->GetPlayer()->Rotate(world->GetPlayer()->camera.getSideDir(), -dY * 0.25f);//vertical
+    }
+
+
+    verticalAngle += -dY * 0.25;
+
+    if(verticalAngle > 180)verticalAngle = 180;
+    if(verticalAngle < 22.5) verticalAngle = 22.5;
 
     //end pos
     prevMouseX = x;

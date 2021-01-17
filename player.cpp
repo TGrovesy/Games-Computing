@@ -5,11 +5,18 @@ Player::Player(dWorldID w, dSpaceID s) : GameObject(w, s), horizontalAngle(0.0f)
     SetupCamera();
 }
 
+Player::~Player(){
+
+}
+
 void Player::SetupCamera(){
     // Set up the OpenFrameworks camera
     camera.setGlobalPosition(position.x, position.y, position.z);
+    camera.lookAt(ofVec3f(0,1,0));
+
     camera.setFov(90);
     camera.setNearClip(0.01f);
+    camera.setFarClip(51000);
 }
 
 void Player::Update(float deltaTime){
@@ -38,6 +45,11 @@ void Player::Rotate(ofVec3f rotationAxis, float amount){
 
 void Player::Draw(){
     GameObject::Draw();
+}
+
+void Player::SetPosition(ofVec3f position){
+    GameObject::SetPosition(position);
+    camera.setPosition(position.x, position.y, position.z + (scale.z));
 }
 
 void Player::FrameBegin(){

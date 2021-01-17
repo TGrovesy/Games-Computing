@@ -32,6 +32,7 @@ public:
     //WORLD
     static World* world;
     static World* GetWorld() {return world;}
+    static void SetWorld(World* world){ofApp::world = world;}
 
     //ODE experimentation
     dWorldID worldID;

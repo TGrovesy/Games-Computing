@@ -39,11 +39,11 @@ void Cylinder::Draw(){
     ofPushMatrix();
     ofTranslate(ofVec3f(position.x, position.y, position.z));
     ofRotateDeg(rotationAmount, rotationAngle.x, rotationAngle.y, rotationAngle.z);
-    if(isTextured) texture.bind();
+    if(isTextured) texture->bind();
     if(hasMaterial)material->begin();
     ofDrawCylinder(0,0,0, this->radius, this->length);
     if(hasMaterial) material->end();
-    if(isTextured) texture.unbind();
+    if(isTextured) texture->unbind();
     ofPopMatrix();
 
 

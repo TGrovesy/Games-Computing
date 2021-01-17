@@ -18,17 +18,17 @@ public:
 
     //Rendering
     void SetTexture(std::string path);
-    void SetTexture(ofTexture tex);
-    ofTexture& GetTexture(){return texture;}
-    void SetTextureScale(float value){textureScale = value;}
+    void SetTexture(ofTexture* tex);
+    ofTexture* GetTexture(){return texture;}
+    void SetTextureScale(ofVec2f value){textureScale = value;}
 
     void SetMaterial(ofMaterial* material);
 
     //Transform Stuff
-    void SetPosition(ofVec3f pos);
-    ofVec3f GetPosition(){return position;}
+    virtual void SetPosition(ofVec3f pos);
+    virtual ofVec3f GetPosition(){return position;}
     virtual void SetScaling(ofVec3f scale);
-    void SetRotation(ofQuaternion rotation);
+    virtual void SetRotation(ofQuaternion rotation);
     void Rotate(ofVec3f rotationAxis, float amount);
     ofVec3f GetScale()  { return scale; }
     ofQuaternion GetRotation() {return rotation;}
@@ -42,15 +42,21 @@ public:
 
     //ODE
     void SetupPhysics(dWorldID id, dSpaceID collisionSpace);
-    dxGeom* GetGeom() {return geom;}
+    virtual dxGeom* GetGeom() {return geom;}
     dBodyID GetBody(){return body;}
+    virtual void SetTorque(float x, float y, float z);
+    virtual void SetForce(float x, float y, float z);
+    virtual dSpaceID GetSpace(){return space;}
 
     virtual void SetKinematic(bool value);
 
     virtual void DisableGravity();
 
     void SetMass(dReal newMass);
+    bool GetCanJump(){return playerCanJump;}
+    void SetPlayerJump(bool value){playerCanJump = value;}
 
+    void DisableBody();
 
 
 
@@ -63,8 +69,8 @@ protected:
     float rotationAmount = 0.f;
 
     //Rendering
-    ofTexture& texture = *new ofTexture();
-    float textureScale = 1;
+    ofTexture* texture = new ofTexture();
+    ofVec2f textureScale = ofVec2f(1,1);
     bool isTextured = false;
 
     ofMaterial* material;
@@ -76,6 +82,9 @@ protected:
     dBodyID body;
     dMass mass;
     dGeomID geom;
+    bool hasBody = true;
+    bool playerCanJump = false;
+
 
 
     bool isKinematic = false;

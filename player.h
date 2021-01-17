@@ -8,6 +8,7 @@ class Player : public GameObject
 {
 public:
     Player(dWorldID w, dSpaceID s);
+    ~Player();
 
 
     virtual void Update(float deltaTime);
@@ -15,6 +16,8 @@ public:
 
     void SetRotation(ofQuaternion rotation);
     void Rotate(ofVec3f rotationAxis, float amount);
+
+    void SetPosition(ofVec3f position);
 
     void FrameBegin();
     void FrameEnd();

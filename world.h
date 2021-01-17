@@ -9,11 +9,13 @@
 #include "cube.h"
 #include "player.h"
 #include "wall.h"
+#include "plane.h"
 
 class World
 {
 public:
     World();
+    ~World();
 
 
     void SetWorldID(dWorldID id);
@@ -25,6 +27,7 @@ public:
     void Update(float deltaTime);
     void collide(dGeomID o1, dGeomID o2);
 
+    void InsertObject(GameObject* obj){gameObjects.push_back(obj);}
     std::vector<GameObject*> GetGameObjects(){return gameObjects;}
     Player* GetPlayer(){return player;}
 
@@ -33,7 +36,13 @@ private:
     std::vector<GameObject*> gameObjects;
     std::map<dxGeom*, GameObject*> geoms;
 
-    //ofLight tmpLight;
+    //Sky Box
+    Plane* skyBoxUp;
+    Plane* skyBoxDown;
+    Plane* skyBoxLeft;
+    Plane* skyBoxRight;
+    Plane* skyBoxBack;
+    Plane* skyBoxFront;
 
     //Player
     Player* player;
@@ -54,14 +63,29 @@ private:
     void SetupPhysics();
 
     //Gamemode (Endless Runner)
+    bool gameStart = false;
+    bool gameOver = false;
     void GamemodeCheck(GameObject* obj);
-    void GamemodeGeneration();
+    void GameReset();
+    float roadWidth = 256;
+    float roadLength = 1000000;
+    float score = 0.f;
+    //void GamemodeGeneration();
+
+    //Gamemode bug fixing variables
+    int objsMovedOnUpdate = 0;
 
     Wall* gameWall;
     std::map<GameObject*, bool> undelteableObj;
 
     int numOfTrucks = 0;
     int numOfPlatforms = 0;
+
+    float truckSpawnZ = 12.f;
+
+    //sounds
+    ofSoundPlayer jumpSound;
+    ofSoundPlayer crashSound;
 };
 
 #endif // WORLD_H
